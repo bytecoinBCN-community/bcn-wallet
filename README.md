@@ -10,10 +10,10 @@ This is an independent Bytecoin community project, not affiliated with the Bytec
 
 ## Download
 
-From [Releases](../../releases):
+From [bytecoin.community](https://bytecoin.community/#downloads):
 
 - `BCNWallet-<version>-setup.exe` — installs for your user only (no administrator rights) into `%LOCALAPPDATA%\Programs\BCN Wallet`, adds Start menu and desktop shortcuts and an entry in Settings → Apps for uninstalling. Wallets and settings are kept in `%APPDATA%\BCN Wallet`; install, update and uninstall never touch them.
-- `BCNWallet-<version>-win-portable.zip` — unpack anywhere, a USB stick included, and run `BCNWallet.exe`. Everything (settings, wallet files, cache, and the blockchain in full-node mode) stays in the `data` folder next to it.
+- `BCNWallet-<version>-win-portable.zip` — unpack anywhere, a USB stick included, and run `BCNWallet.exe`. Everything (settings, wallet files, cache, and the blockchain in full-node mode) stays in the `data` folder next to it. **That folder holds your wallets:** deleting or replacing it, unpacking an update on top of it, or starting the program straight from the zip loses them. Write down the 24 words first, keep the folder out of Downloads, temporary and cloud-synced folders, and back it up while the wallet is closed.
 
 Both contain `walletd.exe` and `bytecoind.exe` 3.5.1 from the [official Bytecoin release](https://github.com/bcndev/bytecoin/releases/tag/v3.5.1), unchanged. `SHA256SUMS` lists the checksums of both files. Nothing else has to be installed: .NET Framework 4.8 ships with Windows 10 and 11.
 
