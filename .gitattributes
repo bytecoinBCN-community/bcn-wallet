@@ -1,0 +1,4 @@
+# Windows project: text files are checked out with CRLF, stored with LF
+* text=auto eol=crlf
+*.png binary
+*.ico binary
