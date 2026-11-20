@@ -19,6 +19,9 @@ namespace BcnWallet
         public string Mnemonic;     // Create / Restore
         public string Keys;         // ImportKeys: 256 hex chars from an old (legacy) wallet
         public long CreationTs;     // Restore: unix time to start scanning from (0 = from the beginning)
+        public string MnemonicPassword = "";    // Restore: BIP39 passphrase (from an .amwbackup file; normally empty)
+        public int AddressCount = 1;            // Restore: addresses to recreate after opening
+        public string ExpectFirstAddress;       // Restore from a backup: the first address the file names
     }
 
     public class TxItem
@@ -252,7 +255,7 @@ namespace BcnWallet
                     args.Append(" --create-wallet --launch-after-command --creation-timestamp=")
                         .Append(req.Kind == OpenKind.Create ? "now" : Math.Max(0, req.CreationTs).ToString(CultureInfo.InvariantCulture));
                     stdin.Add(req.Mnemonic.Trim());
-                    stdin.Add("");
+                    stdin.Add(req.MnemonicPassword ?? "");
                     stdin.Add(req.Password); stdin.Add(req.Password);
                     break;
                 case OpenKind.ImportKeys:
@@ -316,7 +319,132 @@ namespace BcnWallet
             Password = req.Password;
             rpc = r;
             pollKey = "";
+            // an amethyst wallet restored from its phrase starts with one address; recreate the others by index
+            if (req.Kind == OpenKind.Restore && req.AddressCount > Info.AddressCount && Info.Type == "amethyst")
+            {
+                try
+                {
+                    r.Call("get_wallet_records", new Dictionary<string, object> { { "create", true }, { "index", 0 }, { "count", req.AddressCount } }, 60000);
+                    Info.AddressCount = req.AddressCount;
+                }
+                catch (Exception ex) { Log("gui", "create addresses: " + ex.Message); }
+            }
             StartPolling();
+        }
+
+        // ------------------------------------------------------------------ .amwbackup
+
+        // First address of an amethyst wallet made from this phrase + passphrase: walletd creates a throw-away
+        // wallet file (with a random password) in a temporary folder and prints the address.
+        public static string AddressOfMnemonic(string mnemonic, string mnemonicPassword)
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "bcnw-" + RandomToken(12));
+            Directory.CreateDirectory(dir);
+            try
+            {
+                var pw = RandomToken(24);
+                List<string> o;
+                int code = Daemon.RunOnce(NodeFiles.Walletd, "--wallet-file=" + Q(Path.Combine(dir, "probe.wallet")) + " --data-folder=" + Q(dir) +
+                    " --create-wallet --creation-timestamp=now", new[] { mnemonic, mnemonicPassword ?? "", pw, pw }, out o, 60000);
+                if (code != 0) throw new Exception(ErrorText(code, o));
+                const string marker = "first address ";
+                foreach (var l in o)
+                {
+                    int i = l.IndexOf(marker, StringComparison.Ordinal);
+                    if (i >= 0) return l.Substring(i + marker.Length).Trim();
+                }
+                throw new Exception(L.T("err.export"));
+            }
+            finally { try { Directory.Delete(dir, true); } catch { } }
+        }
+
+        // The payload of an .amwbackup file (format version 2). snapshotReason is empty when the wallet state was
+        // included, otherwise it says why not (the file then restores from the creation date).
+        public Dictionary<string, object> BackupPayload(string walletPassword, Action<string> step, out string snapshotReason, out long snapshotHeight)
+        {
+            var r = rpc;
+            if (r == null || Info == null) throw new Exception(L.T("err.closed"));
+            if (Info.Type != "amethyst" || Info.ViewOnly) throw new Exception(L.T("bk.only_amethyst"));
+            if (walletPassword != Password) throw new Exception(L.T("err.207"));
+            step(L.T("bk.step_phrase"));
+            var mnemonic = ExportSecret(walletPassword);
+            if (mnemonic.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length < 12) throw new Exception(L.T("bk.only_amethyst"));
+            // walletd cannot tell whether the phrase has a BIP39 passphrase; the file would restore a different
+            // (empty) wallet if it had one. Rebuild the address from the phrase alone and compare.
+            step(L.T("bk.step_check"));
+            if (AddressOfMnemonic(mnemonic, "") != Info.FirstAddress) throw new Exception(L.T("bk.passphrase"));
+            var wi = r.Call("get_wallet_info", new Dictionary<string, object> { { "need_secrets", false } }, 15000);
+            var payload = new Dictionary<string, object> {
+                { "format", Backup.Format }, { "version", 2 }, { "created_by", "BCN Wallet " + App.Version + " (Windows)" },
+                { "saved_at", DateTimeOffset.UtcNow.ToUnixTimeSeconds() }, { "net", J.Str(wi, "net").Length > 0 ? J.Str(wi, "net") : "main" },
+                { "wallet", new Dictionary<string, object> {
+                    { "type", "amethyst" }, { "mnemonic", mnemonic }, { "mnemonic_password", "" },
+                    { "address_count", Math.Max(1, J.Long(wi, "total_address_count")) }, { "first_address", J.Str(wi, "first_address") },
+                    { "creation_timestamp", J.Long(wi, "wallet_creation_timestamp") } } } };
+            step(L.T("bk.step_state"));
+            snapshotHeight = 0;
+            Dictionary<string, object> snap = null;
+            try { snap = MakeSnapshot(r, out snapshotReason); }
+            catch (Exception ex) { snapshotReason = ex.Message; }
+            if (snap != null) { payload["snapshot"] = snap; snapshotHeight = J.Long(snap, "height"); }
+            return payload;
+        }
+
+        // Wallet state at top - 10 (format section 2): balance, unspent outputs with key images, history.
+        Dictionary<string, object> MakeSnapshot(Rpc r, out string reason)
+        {
+            reason = "";
+            var st = r.Call("get_status", null, 15000);
+            long top = J.Long(st, "top_block_height"), known = J.Long(st, "top_known_block_height");
+            if (!(known > 0 && top >= known)) { reason = L.T("bk.not_synced"); return null; }
+            long height = top - Backup.SnapshotDepth;
+            var node = Nodes.Normalize(NodeAddress);
+            Dictionary<string, object> hdr = null;
+            try { hdr = J.Obj(Nodes.Call(node, "get_block_header", new Dictionary<string, object> { { "height_or_depth", height } }, 20000), "block_header"); } catch { }
+            if (hdr == null || J.Long(hdr, "height") != height || J.Str(hdr, "hash").Length != 64) { reason = L.F("bk.no_block", height); return null; }
+            var at = new Dictionary<string, object> { { "height_or_depth", height } };
+            var balance = r.Call("get_balance", at, 60000);
+            var u = r.Call("get_unspents", at, 60000);
+            var unspents = new List<object>();
+            foreach (var k in new[] { "spendable", "locked_or_unconfirmed" }) unspents.AddRange(J.Arr(u, k).Cast<object>());
+            decimal sum = 0;
+            foreach (Dictionary<string, object> o in unspents)
+            {
+                if (J.Str(o, "key_image").Trim('0').Length == 0) { reason = L.T("bk.no_key_image"); return null; }
+                sum += Convert.ToDecimal(o["amount"], CultureInfo.InvariantCulture);
+            }
+            decimal total = 0;
+            foreach (var k in new[] { "spendable", "spendable_dust", "locked_or_unconfirmed" })
+                if (balance.ContainsKey(k)) total += Convert.ToDecimal(balance[k], CultureInfo.InvariantCulture);
+            long count = J.Long(balance, "spendable_outputs") + J.Long(balance, "spendable_dust_outputs") + J.Long(balance, "locked_or_unconfirmed_outputs");
+            if (sum != total || unspents.Count != count) { reason = L.T("bk.mismatch"); return null; }
+            var first = r.Call("get_transfers", new Dictionary<string, object> {
+                { "from_height", 0 }, { "to_height", height }, { "forward", true }, { "desired_transaction_count", 1 } }, 60000);
+            var fb = J.Obj(J.Arr(first, "blocks").FirstOrDefault(), "header");
+            var blocks = new List<Dictionary<string, object>>();
+            for (long from = 0; from < height; )
+            {
+                var page = r.Call("get_transfers", new Dictionary<string, object> {
+                    { "from_height", from }, { "to_height", height }, { "forward", true }, { "desired_transaction_count", 1000 }, { "need_outputs", true } }, 120000);
+                var pb = J.Arr(page, "blocks");
+                if (pb.Count == 0) break;
+                blocks.AddRange(pb);
+                long next = J.Long(page, "next_from_height");
+                if (next <= from) break;
+                from = next;
+            }
+            var snap = new Dictionary<string, object> {
+                { "height", height }, { "block_hash", J.Str(hdr, "hash") }, { "block_timestamp", J.Long(hdr, "timestamp") },
+                { "first_activity_height", fb != null ? J.Long(fb, "height") : 0 }, { "first_activity_timestamp", fb != null ? J.Long(fb, "timestamp") : 0 },
+                { "balance", balance }, { "unspents", unspents }, { "history_from_height", 0L }, { "blocks", blocks } };
+            // too long a history: drop the oldest tenth until it fits (balance and spending use the unspents)
+            while (blocks.Count > 0 && Encoding.UTF8.GetByteCount(Backup.ToJson(snap)) > Backup.MaxPayload)
+            {
+                blocks = blocks.Skip((blocks.Count + 9) / 10).ToList();
+                snap["blocks"] = blocks;
+                snap["history_from_height"] = blocks.Count > 0 ? J.Long(J.Obj(blocks[0], "header"), "height") - 1 : height;
+            }
+            return snap;
         }
 
         void StopWalletd()

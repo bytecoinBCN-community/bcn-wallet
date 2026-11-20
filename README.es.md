@@ -52,6 +52,7 @@ El modo nodo completo necesita una *carpeta de datos* de bytecoind, la que conti
 - Mostrar las 24 palabras (o las claves de un monedero antiguo) y copiarlas enteras: el portapapeles se borra a los 60 segundos; cambiar la contraseña; exportar una copia de solo lectura.
 - Página de la comunidad: enlace a [BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) con «copiar mi dirección para minar» en un clic, el pool de la comunidad, el sitio, el explorador, el monedero web, Telegram y GitHub.
 - Icono en la bandeja con avisos de pagos recibidos, inicio con Windows y opción de ocultar los importes.
+- Página **iOS · Android · Web**: lleva el monedero a [Amethyst Web Wallet](https://web.bytecoin.community) (navegador o app en iPhone/Android) con un archivo cifrado `.amwbackup` (las 24 palabras y el estado del monedero, con su propia contraseña), y restaura ese archivo aquí (pantalla de inicio → «Desde archivo .amwbackup»).
 
 ![Pantalla de inicio](docs/screenshots/start-dark.png)
 

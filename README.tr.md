@@ -52,6 +52,7 @@ Tam düğüm modu bir bytecoind *veri klasörüne*, yani `blockchain` alt klasö
 - 24 kelimeyi (ya da eski bir cüzdanın anahtarlarını) gösterme ve tamamını kopyalama: pano 60 saniye sonra temizlenir; parola değiştirme; salt görüntüleme kopyası dışa aktarma.
 - Topluluk sayfası: tek tıkla «madencilik için adresimi kopyala» ile [BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) bağlantısı, topluluk havuzu, site, gezgin, web cüzdanı, Telegram ve GitHub.
 - Gelen ödeme bildirimleriyle sistem tepsisi simgesi, Windows ile başlatma, tutarları gizleme.
+- **iOS · Android · Web** sayfası: cüzdanı şifreli bir `.amwbackup` dosyasıyla (24 kelime ve cüzdan durumu, kendi parolasıyla) [Amethyst Web Wallet](https://web.bytecoin.community)'a (tarayıcı veya iPhone/Android uygulaması) taşıyın ve böyle bir dosyayı burada geri yükleyin (başlangıç ekranı → «.amwbackup dosyasından»).
 
 ![Başlangıç ekranı](docs/screenshots/start-dark.png)
 

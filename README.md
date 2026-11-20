@@ -52,6 +52,19 @@ Full-node mode needs a bytecoind *data folder* — the folder that contains the 
 - Show the 24 words (or the keys of an old wallet) and copy them whole — the clipboard is cleared after 60 seconds; change the password, export a view-only copy.
 - Community page: link to [BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) with one-click "copy my address for mining", the community pool, site, explorer, web wallet, Telegram and GitHub.
 - Tray icon with notifications about incoming payments, start with Windows, hide amounts.
+- **iOS · Android · Web** page: move the wallet to [Amethyst Web Wallet](https://web.bytecoin.community) (browser, or installed app on iPhone/Android) with an encrypted `.amwbackup` file, and restore such a file here (start screen → "From .amwbackup file").
+
+### Phone and web: the `.amwbackup` file
+
+![iOS · Android · Web](docs/screenshots/mobile-dark.png)
+
+The file follows the Amethyst Web Wallet format (`docs/amwbackup-format.md` in its repository), version 2: `"AMWBACKUP1"` + salt + nonce + AES-256-GCM, key from PBKDF2-HMAC-SHA256 with 600 000 iterations (Windows CNG), protected by its own password of at least 10 characters.
+
+- **Inside:** the 24 words, creation date, number of addresses and, when the wallet is synced, its state at block *top − 10*: balance, unspent outputs with key images, history and the first-payment height. The web wallet and the phone app then scan only from the first payment instead of from the creation date.
+- **Only amethyst wallets** (24 words, address `bcnZ…`). Legacy (`2…`), Ledger and view-only wallets have no words; move them with the `.wallet` file.
+- **Mnemonic passphrase:** walletd does not report it, so before writing the file the wallet rebuilds the first address from the words alone (a throw-away wallet in a temp folder) and refuses if it differs.
+- The phrase is read with `walletd --export-mnemonic` (as "Show words" does), not through JSON-RPC: walletd only returns secrets over RPC when started with `--secrets-via-api`, which this wallet never uses.
+- **Restoring here** decrypts the file, checks the words, and creates a new `.wallet` with scanning from the first payment (or the snapshot block, or the creation date) minus one day; extra addresses are recreated, and the first address is compared with the one in the file.
 
 ![Start screen](docs/screenshots/start-dark.png)
 

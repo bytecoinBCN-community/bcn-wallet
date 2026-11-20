@@ -52,6 +52,7 @@ O modo nó completo precisa de uma *pasta de dados* do bytecoind, a que contém 
 - Mostrar as 24 palavras (ou as chaves de uma carteira antiga) e copiá-las inteiras: a área de transferência é limpa após 60 segundos; trocar a senha; exportar uma cópia somente leitura.
 - Página da comunidade: link para o [BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) com «copiar meu endereço para minerar» num clique, o pool da comunidade, o site, o explorador, a carteira web, o Telegram e o GitHub.
 - Ícone na bandeja com avisos de pagamentos recebidos, iniciar com o Windows e ocultar valores.
+- Página **iOS · Android · Web**: leve a carteira para a [Amethyst Web Wallet](https://web.bytecoin.community) (navegador ou app no iPhone/Android) com um arquivo criptografado `.amwbackup` (as 24 palavras e o estado da carteira, com senha própria), e restaure esse arquivo aqui (tela inicial → «De arquivo .amwbackup»).
 
 ![Tela inicial](docs/screenshots/start-dark.png)
 

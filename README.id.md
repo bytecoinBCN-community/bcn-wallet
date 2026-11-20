@@ -52,6 +52,7 @@ Mode node penuh membutuhkan *folder data* bytecoind, yaitu folder yang berisi su
 - Menampilkan 24 kata (atau kunci dompet lama) dan menyalinnya utuh: papan klip dibersihkan setelah 60 detik; mengganti kata sandi; mengekspor salinan hanya-lihat.
 - Halaman komunitas: tautan ke [BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) dengan «salin alamat saya untuk menambang» sekali klik, pool komunitas, situs, penjelajah, dompet web, Telegram, dan GitHub.
 - Ikon baki dengan notifikasi pembayaran masuk, mulai bersama Windows, sembunyikan jumlah.
+- Halaman **iOS · Android · Web**: pindahkan dompet ke [Amethyst Web Wallet](https://web.bytecoin.community) (peramban atau aplikasi di iPhone/Android) dengan berkas terenkripsi `.amwbackup` (24 kata dan keadaan dompet, dengan kata sandi sendiri), dan pulihkan berkas seperti itu di sini (layar awal → «Dari berkas .amwbackup»).
 
 ![Layar awal](docs/screenshots/start-dark.png)
 

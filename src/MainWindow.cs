@@ -183,7 +183,7 @@ namespace BcnWallet
             body.Children.Add(BuildNav());
             var host = new Grid();
             Grid.SetColumn(host, 1);
-            pages = new FrameworkElement[] { BuildOverview(), BuildSend(), BuildReceive(), BuildHistory(), BuildContacts(), BuildCommunity(), BuildSettings() };
+            pages = new FrameworkElement[] { BuildOverview(), BuildSend(), BuildReceive(), BuildHistory(), BuildContacts(), BuildCommunity(), BuildMobile(), BuildSettings() };
             foreach (var p in pages) { p.Visibility = Visibility.Collapsed; host.Children.Add(p); }
             pages[0].Visibility = Visibility.Visible;
             currentPage = 0;
@@ -208,8 +208,8 @@ namespace BcnWallet
             brand.Margin = new Thickness(10, 0, 10, 20);
             top.Children.Add(brand);
 
-            string[] labels = { L.T("nav.overview"), L.T("nav.send"), L.T("nav.receive"), L.T("nav.history"), L.T("nav.contacts"), L.T("nav.community"), L.T("nav.settings") };
-            string[] icons = { U.IcHome, U.IcSend, U.IcReceive, U.IcHistory, U.IcBook, U.IcPeople, U.IcSettings };
+            string[] labels = { L.T("nav.overview"), L.T("nav.send"), L.T("nav.receive"), L.T("nav.history"), L.T("nav.contacts"), L.T("nav.community"), L.T("nav.mobile"), L.T("nav.settings") };
+            string[] icons = { U.IcHome, U.IcSend, U.IcReceive, U.IcHistory, U.IcBook, U.IcPeople, U.IcPhone, U.IcSettings };
             navs = new RadioButton[labels.Length];
             for (int i = 0; i < labels.Length; i++)
             {
@@ -261,7 +261,7 @@ namespace BcnWallet
             if (idx == 2) RefreshAddresses();
             if (idx == 3) ReloadHistory();
             if (idx == 4) RebuildContacts();
-            if (idx == 6) RefreshSettings();
+            if (idx == 7) RefreshSettings();
         }
 
         void Go(int idx) { if (navs != null) navs[idx].IsChecked = true; }
@@ -530,11 +530,14 @@ namespace BcnWallet
             Error(L.T("err.walletd_stopped") + "\n\n" + msg);
         }
 
-        void LockWallet()
+        void LockWallet() { LockWallet(null); }
+
+        void LockWallet(Action then)
         {
             if (busy) return;
             ShowProgress(L.T("p.locking"), L.T("p.locking_text"));
-            Run(() => W.Close(false), () => { snap = null; knownTx.Clear(); knownTxLoaded = false; CloseModal(); ShowStart(); }, ex => { CloseModal(); ShowStart(); });
+            Run(() => W.Close(false), () => { snap = null; knownTx.Clear(); knownTxLoaded = false; CloseModal(); ShowStart(); if (then != null) then(); },
+                ex => { CloseModal(); ShowStart(); if (then != null) then(); });
         }
 
         // Re-open the same wallet after a node setting changed (password is kept in memory while the wallet is open).

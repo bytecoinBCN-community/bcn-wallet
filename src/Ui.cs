@@ -47,7 +47,8 @@ namespace BcnWallet
         public const string IcDownload = "M12 4v11M7 10l5 5 5-5M5 20h14";
         public const string IcExternal = "M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5";
         public const string IcTrash = "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3";
-        public const string IcChat = "M4 5h16v11H9l-5 4z";
+        public const string IcPhone = "M8 2.5h8a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H8A1.5 1.5 0 0 1 6.5 20V4A1.5 1.5 0 0 1 8 2.5zM11 18h2";
+        public const string IcChat ="M4 5h16v11H9l-5 4z";
         public const string IcServer = "M4.5 4h15a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 9.5v-4A1.5 1.5 0 0 1 4.5 4zM4.5 13h15a1.5 1.5 0 0 1 1.5 1.5v4a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5v-4A1.5 1.5 0 0 1 4.5 13zM7 7.5h.01M7 16.5h.01";
 
         public static PasswordBox Pass(string accessibleName)

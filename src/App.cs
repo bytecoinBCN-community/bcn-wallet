@@ -11,15 +11,15 @@ using System.Windows.Markup;
 [assembly: AssemblyDescription("Desktop wallet for Bytecoin (BCN): light mode via a remote node or a full node with the blockchain")]
 [assembly: AssemblyCompany("Bytecoin Community")]
 [assembly: AssemblyCopyright("Bytecoin Community, LGPL-3.0")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyInformationalVersion("1.1.0")]
 
 namespace BcnWallet
 {
     public static class App
     {
-        public const string Version = "1.0.0";
+        public const string Version = "1.1.0";
         public const string SiteUrl = "https://bytecoin.community";
         public const string RepoUrl = "https://github.com/bytecoinBCN-community/bcn-wallet";
         public const string ExplorerUrl = "https://explorer.bytecoin.community";

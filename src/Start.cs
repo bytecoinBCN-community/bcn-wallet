@@ -75,8 +75,10 @@ namespace BcnWallet
             var hw = U.Btn(L.T("start.hw"), "Small", (a, e) => { if (!NodeFiles.Installed) DownloadNodeFlow(HardwareFlow); else HardwareFlow(); }, U.IcShield);
             var lg = U.Btn(L.T("start.legacy"), "Small", (a, e) => { if (!NodeFiles.Installed) DownloadNodeFlow(LegacyFlow); else LegacyFlow(); }, U.IcKey);
             hw.ToolTip = L.T("start.hw_d"); lg.ToolTip = L.T("start.legacy_d");
-            hw.Margin = new Thickness(0, 0, 8, 8); lg.Margin = new Thickness(0, 0, 8, 8);
-            more.Children.Add(hw); more.Children.Add(lg);
+            var bk = U.Btn(L.T("bk.import_short"), "Small", (a, e) => ImportBackupFlow(), U.IcPhone);
+            bk.ToolTip = L.T("bk.import_d");
+            hw.Margin = new Thickness(0, 0, 8, 8); lg.Margin = new Thickness(0, 0, 8, 8); bk.Margin = new Thickness(0, 0, 8, 8);
+            more.Children.Add(bk); more.Children.Add(hw); more.Children.Add(lg);
             sp.Children.Add(more);
 
             // recent wallets
@@ -272,7 +274,11 @@ namespace BcnWallet
                 knownTx.Clear(); knownTxLoaded = false;
                 CloseModal();
                 ShowShell();
-                if (req.Kind == OpenKind.Restore)
+                if (req.ExpectFirstAddress != null && req.ExpectFirstAddress.Length > 0 && W.Info != null && W.Info.FirstAddress != req.ExpectFirstAddress)
+                    Error(L.F("bk.addr_mismatch", Short(req.ExpectFirstAddress), Short(W.Info.FirstAddress)));
+                else if (req.ExpectFirstAddress != null)
+                    Info(L.T("restore.done"), L.T("bk.restored"));
+                else if (req.Kind == OpenKind.Restore)
                     Info(L.T("restore.done"), L.T("restore.done_text"));
             }, ex =>
             {

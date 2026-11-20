@@ -57,7 +57,7 @@ namespace BcnWallet
             return u.Scheme + "://" + u.Host + ":" + port.ToString(CultureInfo.InvariantCulture);
         }
 
-        static Dictionary<string, object> Call(string url, string method, object prms, int timeoutMs)
+        public static Dictionary<string, object> Call(string url, string method, object prms, int timeoutMs)
         {
             ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12;
             var ser = new JavaScriptSerializer();

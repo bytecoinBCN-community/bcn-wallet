@@ -52,6 +52,7 @@ Chế độ nút đầy đủ cần một *thư mục dữ liệu* của bytecoi
 - Hiển thị 24 từ (hoặc khóa của ví cũ) và sao chép toàn bộ: bộ nhớ tạm được xóa sau 60 giây; đổi mật khẩu; xuất bản sao chỉ xem.
 - Trang cộng đồng: liên kết tới [BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) với nút «sao chép địa chỉ của tôi để đào» một chạm, pool cộng đồng, trang web, trình khám phá, ví web, Telegram và GitHub.
 - Biểu tượng khay hệ thống với thông báo khoản nhận, khởi động cùng Windows, ẩn số tiền.
+- Trang **iOS · Android · Web**: chuyển ví sang [Amethyst Web Wallet](https://web.bytecoin.community) (trình duyệt hoặc ứng dụng trên iPhone/Android) bằng tệp mã hóa `.amwbackup` (24 từ và trạng thái ví, với mật khẩu riêng), và khôi phục tệp đó tại đây (màn hình bắt đầu → «Từ tệp .amwbackup»).
 
 ![Màn hình khởi động](docs/screenshots/start-dark.png)
 

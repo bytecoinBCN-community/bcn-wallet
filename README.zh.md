@@ -52,6 +52,7 @@ Bytecoin（BCN）桌面钱包。**可下载区块链，也可不下载**，密�
 - 显示 24 个单词（或旧钱包的密钥）并整体复制：剪贴板 60 秒后清空；修改密码；导出只读副本。
 - 社区页面：[BCN Miner](https://github.com/bytecoinBCN-community/bcn-miner) 链接及一键“复制我的挖矿地址”、社区矿池、网站、区块浏览器、网页钱包、Telegram 和 GitHub。
 - 托盘图标与收款通知，开机自启，隐藏金额。
+- **iOS · Android · Web** 页面：用加密的 `.amwbackup` 文件（24 个单词和钱包状态，带单独密码）把钱包转移到 [Amethyst 网页钱包](https://web.bytecoin.community)（浏览器或 iPhone/Android 应用），也可在这里恢复此类文件（启动界面 → “从 .amwbackup 文件”）。
 
 ![启动界面](docs/screenshots/start-dark.png)
 
